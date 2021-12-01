@@ -5,7 +5,7 @@ const {GridFsStorage} = require('multer-gridfs-storage');
 require('dotenv').config();
 
 const storage = new GridFsStorage({
-    url: process.env.MONGODB_URL,
+    url: "mongodb+srv://ANI791:Prasad252791@cluster0.m8yqt.mongodb.net/fleaFair?retryWrites=true",
     // file:(req,file)=>{
     //     const match = ['image/png','image/jpeg','image/jpg'];
     //     if(match.indexOf(file.mimetype) === -1){
