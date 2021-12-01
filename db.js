@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
-const dbURL = "mongodb+srv://ANI791:Prasad252791@cluster0.m8yqt.mongodb.net/fleaFair?retryWrites=true";
+const dbURL = process.env.MONGODB_URL;
 
 module.exports = async function connection(){
     try {

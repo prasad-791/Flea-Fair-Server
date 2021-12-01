@@ -9,8 +9,6 @@ const connection = require('./db');
 
 const app = express();
 const Port = process.env.PORT || 3000;
-// const Port = process;
-// const dbURL = process.env.MONGODB_URL;
 
 // Init gfs
 let gfs;
