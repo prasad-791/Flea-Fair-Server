@@ -47,10 +47,17 @@ exports.loginController = async (req, res) => {
                                 //     expiresIn:"24hr"
                                 // }
                             );
-
+                            var image = user.profileImg.toString('base64');
                             res.status(200).send({
                                 message: "Logged In Successfully!",
                                 token: token,
+                                user: {
+                                    id: user._id,
+                                    name: user.name,
+                                    username: user.username,
+                                    email: user.email,
+                                    image: image,
+                                },
                             });
                         }else{
                             res.status(403).send({message:"Invalid Password"});
