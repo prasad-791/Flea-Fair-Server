@@ -13,7 +13,7 @@ const connection = mongoose.connection;
 let gfs;
 connection.once('open',()=>{
     gfs = Grid(connection.db,mongoose.mongo);
-    gfs.collection('profileImages');
+    gfs.collection('profileImages.files');
 });
 
 // LOGIN CONTROLLER
@@ -79,7 +79,7 @@ var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth:{
         user: "fleafair791@gmail.com",
-        pass: "Nashik@123",
+        pass: "evtkrddzpywamitv",
     },
     tls:{
         rejectUnauthorized: false,
@@ -167,7 +167,7 @@ exports.logoutController = async(req,res)=>{
 // GET USER PROFILE IMAGE
 exports.getProfileImageController = async(req,res)=>{
     try {
-        gfs.files.find({filename: req.params.filename})
+        gfs.find({filename: req.params.filename})
         .toArray((err,files)=>{
             if(!files[0] || files.length === 0){
                 return res.status(200).json({
@@ -179,6 +179,20 @@ exports.getProfileImageController = async(req,res)=>{
                 success: true,
                 file: files[0],
             });
+            // try{
+            //     gfs.chunk.find({files_id: files[0]._id}).toArray((err,chunks)=>{
+            //         res.json({
+            //             success: true,
+            //             file: files[0],
+            //             chunk: chunks[0]
+            //         });
+            //     });
+            // }catch(e){
+            //     res.send({
+            //         "error": e.message,
+            //     })
+            // }
+
         });
 
     } catch (error) {

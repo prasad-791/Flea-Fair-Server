@@ -33,47 +33,6 @@ app.get('/',(req,res)=>{
         "message":"Hello From Flea Fair"
     });
 })
-app.get('/files',(req,res)=>{
-    gfs.files.find().toArray((err,files)=>{
-        // if(!files || files.length === 0){
-        //     return res.status(404).send({
-        //         error: "No files exists",
-        //     });
-        // }
-        return res.json(files);
-    });
-});
-
-app.get('/file/:filename',async (req,res)=>{
-    try {
-        gfs.files.find({filename: req.params.filename})
-        .toArray((err,files)=>{
-            if(!files[0] || files.length === 0){
-                return res.status(200).json({
-                    success: false,
-                    message: "No files available",
-                });
-            }
-            if(files[0].contentType === 'image/jpeg'
-                || files[0].contentType === 'image/png'
-                || files[0].contentType === 'image/jpg'){
-                    
-                    gfs.openDownloadStreamByName(files[0].filename).pipe(res);
-
-            }else{
-                res.status(404).json({
-                    err:'Not an image',
-                });
-            }
-        });
-
-    } catch (error) {
-        res.send({
-            error: error.message,
-        });
-        console.log(error);
-    }
-});
 
 try{
     app.listen(Port,()=>{

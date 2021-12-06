@@ -1,6 +1,8 @@
 const express = require('express');
 const checkAuth = require('./middleware/auth');
 const uploadMiddleware = require('./middleware/upload');
+const upload = require('./middleware/uploadProfileImage');
+const User = require('../models/user');
 require('dotenv').config();
 
 // controllers
@@ -41,3 +43,19 @@ router.patch('/updateimage/:id',checkAuth,uploadMiddleware.single('file'),update
 // Get Profile Image
 router.get('/getprofileimg/:filename',userController.getProfileImageController);
 module.exports = router;
+
+router.post('/uploadimage/:id',checkAuth,upload.single('file'),updateUserController.uploadProfileImage,(err,req,res,next)=>{
+    res.status(400).send({error:err.message});
+});
+
+router.get('/getImage/:id',checkAuth,async(req,res)=>{
+    var user = await User.findOne({_id:req.params.id});
+    var image = user.profileImg.toString('base64');
+    if(user){
+        res.send({
+            data: image,
+        });
+    }else{
+        res.params.send({error:"No user found"});
+    }
+});

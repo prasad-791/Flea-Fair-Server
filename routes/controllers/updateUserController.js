@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const multer = require('multer');
 const gridFsStorage = require('multer-gridfs-storage');
 const gridStream = require('gridfs-stream');
+const sharp = require('sharp');
 
 require('dotenv').config();
 
@@ -86,5 +87,17 @@ exports.updateProfileImage = async(req,res)=>{
         res.status(404).send({
             error: error.message,
         });
+    }
+};
+
+exports.uploadProfileImage = async(req,res)=>{
+    const buffer = await sharp(req.file.buffer).png().toBuffer();
+    var user = await User.findOne({_id:req.params.id});
+    if(user){
+        user.profileImg = buffer;
+        await user.save();
+        res.send(user);
+    }else{
+        res.send({error:"Cannot find User"});
     }
 };
