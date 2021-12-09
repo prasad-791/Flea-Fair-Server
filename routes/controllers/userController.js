@@ -33,7 +33,7 @@ exports.loginController = async (req, res) => {
 
                 bcrypt.compare(req.body.password,user.password,function(err,result){
                     if(err){
-                        res.status(404).send({error:err.message});
+                        res.status(400).send({error:err.message});
                     }else{
                         if(result === true){
 
@@ -47,7 +47,10 @@ exports.loginController = async (req, res) => {
                                 //     expiresIn:"24hr"
                                 // }
                             );
-                            var image = user.profileImg.toString('base64');
+                            var image = null;
+                            if(user.profileImg!=null){
+                                image = user.profileImg.toString('base64');
+                            }
                             res.status(200).send({
                                 message: "Logged In Successfully!",
                                 token: token,
@@ -56,7 +59,12 @@ exports.loginController = async (req, res) => {
                                     name: user.name,
                                     username: user.username,
                                     email: user.email,
+                                    phoneNo: user.phoneNo,
                                     image: image,
+                                    ownedItemList: user.ownedItemList,
+                                    purchasedItemList: user.purchasedItemList,
+                                    shoppingCartList: user.shoppingCartList,
+                                    favouriteItemList: user.favouriteItemList,
                                 },
                             });
                         }else{
@@ -69,14 +77,14 @@ exports.loginController = async (req, res) => {
             }
         })
         .catch(err=>{
-            res.json({
+            res.status(400).json({
                 error: err.message,
             });
         })
 
     } catch (err) {
         console.log(err);
-        res.send({ error: err.message });
+        res.status(400).send({ error: err.message });
     }
 };
 
@@ -121,11 +129,11 @@ exports.registerController = async (req, res) => {
         // sending mail
         transporter.sendMail(mailOptions,function(err,info){
             if(err){
-                res.send({
+                res.status(400).send({
                     error:err.message,
                 })
             }else{
-                res.status(200).send({ 
+                res.status(201).send({ 
                     message: "User Registered Successfully! Kindly check your mail inbox and verify your account.",
                 });
             }
@@ -152,7 +160,7 @@ exports.emailVerificationController = async(req,res)=>{
         }
 
     }catch(err){
-        res.status(404).send({
+        res.status(400).send({
             error: err.message,
         });
     }
@@ -165,7 +173,7 @@ exports.logoutController = async(req,res)=>{
             message:'Logged Out Successfully',
         });
     }catch(err){
-        res.status(404).send({
+        res.status(400).send({
             error: err.message,
         });
     }
@@ -173,39 +181,13 @@ exports.logoutController = async(req,res)=>{
 
 // GET USER PROFILE IMAGE
 exports.getProfileImageController = async(req,res)=>{
-    try {
-        gfs.find({filename: req.params.filename})
-        .toArray((err,files)=>{
-            if(!files[0] || files.length === 0){
-                return res.status(200).json({
-                    success: false,
-                    message: "No files available",
-                });
-            }
-            res.status(200).json({
-                success: true,
-                file: files[0],
-            });
-            // try{
-            //     gfs.chunk.find({files_id: files[0]._id}).toArray((err,chunks)=>{
-            //         res.json({
-            //             success: true,
-            //             file: files[0],
-            //             chunk: chunks[0]
-            //         });
-            //     });
-            // }catch(e){
-            //     res.send({
-            //         "error": e.message,
-            //     })
-            // }
-
+    var user = await User.findOne({_id:req.params.id});
+    var image = user.profileImg.toString('base64');
+    if(user){
+        res.status(200).send({
+            data: image,
         });
-
-    } catch (error) {
-        res.send({
-            error: error.message,
-        });
-        console.log(error);
+    }else{
+        res.status(404).send({error:"No user found"});
     }
 };

@@ -1,4 +1,26 @@
 const mongoose = require('mongoose');
+const { bool } = require('sharp');
+const Product = require('./product');
+
+const favItemListSchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Product'
+    },
+    isAddedToCart: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+});
+
+const itemListSchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+    }
+});
 
 const userSchema = new mongoose.Schema({
     // profile image
@@ -20,6 +42,7 @@ const userSchema = new mongoose.Schema({
         type: Number,
         unique: true,
         required: false,
+        default: null,
     },
     email:{
         type: String,
@@ -46,7 +69,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         // required: true,
     },
-    // 4 more lists: FavouriteList ShoppingCartList OwnedItemList PurchasedItemList 
+    ownedItemList: [
+        itemListSchema
+    ],
+    purchasedItemList: [
+        itemListSchema
+    ],
+    shoppingCartList: [
+        itemListSchema
+    ],
+    favouriteItemList: [
+        favItemListSchema
+    ]
     // advanced: NotificationList
 });
 

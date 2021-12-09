@@ -27,7 +27,7 @@ exports.updateUsernameController= async(req,res)=>{
         }
     }catch(err){
         console.log(err);
-        res.status(404).send({
+        res.status(400).send({
             error: err.message,
         });
     }
@@ -54,50 +54,21 @@ exports.updatePasswordController = async(req,res)=>{
         }
     }catch(err){
         console.log(err);
-        res.status(404).send({
+        res.status(400).send({
             error:err.message,
         })
     }
 };
 
 // Update or Add Profile Image of the User
-exports.updateProfileImage = async(req,res)=>{
-    try {
-
-        var paramID = req.params.id;
-        var user = await User.findOne({_id:paramID});
-        if(user){
-
-            if(req.file === undefined){
-                return res.status(404).send({message:"File Not Found!"});
-            }
-            const imgUrl = `http://${req.headers.host}/file/${req.file.filename}`;
-            return res.send({
-                url: imgUrl,
-                file: req.file
-            });
-    
-        }else{
-            res.status(404).send({
-                error: "User doesn't exist",
-            });
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(404).send({
-            error: error.message,
-        });
-    }
-};
-
 exports.uploadProfileImage = async(req,res)=>{
     const buffer = await sharp(req.file.buffer).png().toBuffer();
     var user = await User.findOne({_id:req.params.id});
     if(user){
         user.profileImg = buffer;
         await user.save();
-        res.send(user);
+        res.status(200).send(user);
     }else{
-        res.send({error:"Cannot find User"});
+        res.status(404).send({error:"Cannot find User"});
     }
 };
