@@ -13,7 +13,7 @@ module.exports = (req,res,next)=>{
 
     }catch(err){
         res.status(403).send({
-            error:"Invalid Token. Try to login again",
+            "error":"Invalid Token. Try to login again",
         });
     }
 };

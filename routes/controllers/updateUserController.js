@@ -8,6 +8,8 @@ const sharp = require('sharp');
 
 require('dotenv').config();
 
+const mode = process.env.mode
+
 // Update Usernmae Controller
 exports.updateUsernameController= async(req,res)=>{
     try{
@@ -17,19 +19,25 @@ exports.updateUsernameController= async(req,res)=>{
             user.username = bodyUsername,
             await user.save();
             res.status(200).send({
-                username: bodyUsername,
-                message: "Username Updated Successfully!",
+                "data": bodyUsername,
+                "message": "Username Updated Successfully!",
             });
         }else{
             res.status(404).send({
-                error: "User doesn't exist",
+                "error": "User doesn't exist",
             })
         }
     }catch(err){
         console.log(err);
-        res.status(400).send({
-            error: err.message,
-        });
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
@@ -45,30 +53,54 @@ exports.updatePasswordController = async(req,res)=>{
             user.password = hashedPassword;
             await user.save();
             res.status(200).send({
-                message: "Password Updated Successfully!",
+                "message": "Password Updated Successfully!",
             })
         }else{
             res.status(404).send({
-                error:"User doesn't exist",
+                "error":"User doesn't exist",
             });
         }
     }catch(err){
         console.log(err);
-        res.status(400).send({
-            error:err.message,
-        })
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
 // Update or Add Profile Image of the User
 exports.uploadProfileImage = async(req,res)=>{
-    const buffer = await sharp(req.file.buffer).png().toBuffer();
-    var user = await User.findOne({_id:req.params.id});
-    if(user){
-        user.profileImg = buffer;
-        await user.save();
-        res.status(200).send(user);
-    }else{
-        res.status(404).send({error:"Cannot find User"});
+    try{
+        // console.log(req.body)
+        // return ;
+        const buffer = await sharp(req.file.buffer).png().toBuffer();
+        var user = await User.findOne({_id:req.params.id});
+        if(user){
+            user.profileImg = buffer;
+            await user.save();
+            res.status(200).send({
+                "message": "Image saved succesfully",
+                "data": user
+            });
+        }else{
+            res.status(404).send({"error":"Cannot find User"});
+        }
+    }catch(err){
+        console.log(err);
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };

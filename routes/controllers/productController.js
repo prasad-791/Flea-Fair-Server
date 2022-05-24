@@ -4,10 +4,11 @@ const sharp = require('sharp');
 
 require('dotenv').config();
 
+const mode = process.env.mode
+
 // ADD NEW PRODUCT
 exports.addProductController = async(req,res)=>{
     try{
-
         var user = await User.findOne({_id: req.params.id});
         if(user){
             let buffer = [];
@@ -28,27 +29,31 @@ exports.addProductController = async(req,res)=>{
                 await product.save();
                 user.ownedItemList.push(product);
                 await user.save();
-                console.log(user);
-                console.log(product);
                 res.status(200).send({
-                    message: "Added Product Successfully",
+                    "message": "Added Product Successfully",
                 })
             }else{
                 res.status(403).send({
-                    error: "Please Verify Phone No before Adding",
+                    "error": "Please Verify Phone No before Adding",
                 })
             }
         }else{
             res.status(404).send({
-                error: "Cannot find User"
+                "error": "Cannot find User"
             });
         }
 
     }catch(err){
         console.log(err);
-        res.status(400).send({
-            error: err.message,
-        });
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
@@ -81,17 +86,23 @@ exports.getLatestProductsController = async(req,res)=>{
             products.push(temp);
         }
 
-        res.status(200).send(products);
+        res.status(200).send({"data":products});
 
     }catch(e){
-        res.status(400).send({
-            error: err.message,
-        });
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
 // GET SPECIFIC PRODUCT BY ID
-exports.getProductController = async(req,res) =>{
+exports.getProductByIDController = async(req,res) =>{
     try{
         var temp = await Product.findOne({_id: req.params.id});
         if(temp){
@@ -117,16 +128,69 @@ exports.getProductController = async(req,res) =>{
             };
 
             res.status(200).send({
-                product: product,
+                "data": product,
             });
         }else{
             res.status(404).send({
-                error: "No such product found"
+                "error": "No such product found"
             });
         }
     }catch(e){
-        res.status(400).send({
-            error: e.message,
-        })
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
+    }
+};
+
+// GET SPECIFIC PRODUCT BY NAME
+exports.getProductByNameController = async(req,res) =>{
+    try{
+        var temp = await Product.findOne({title: req.params.name});
+        if(temp){
+            var owner = await User.findOne({_id:temp.owner});
+            var images = [];
+            for(var j=0;j<temp.productImages.length;j++){
+                images.push(
+                    {
+                        j: temp.productImages[j].toString('base64'),
+                    }
+                );
+            }
+
+            var product = {
+                "id": temp._id,
+                "title": temp.title,
+                "description": temp.description,
+                "price": temp.price,
+                "quantity": temp.quantity,
+                "ownerID": owner._id,
+                "ownerPhoneNo": owner.phoneNo,
+                "productImages": images,
+            };
+
+            res.status(200).send({
+                "data": product,
+            });
+        }else{
+            res.status(404).send({
+                "error": "No such product found"
+            });
+        }
+    }catch(e){
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };

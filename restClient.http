@@ -1,0 +1,127 @@
+@url = http://localhost:3000
+//@url = https://flea-fair.herokuapp.com
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuaWtldGtoYWxrYXI3OTFAZ21haWwuY29tIiwidXNlcklEIjoiNjI4Y2UyZTdmMGI1ZDQ4ZWI5OTcwNTg5IiwiaWF0IjoxNjUzNDAwODAyfQ.NFyS4uYPZZx3gCmJdQwlRUnITNcLrXXI5aIJ2_SbHv0
+@uid = 628ce2e7f0b5d48eb9970589
+@pid = 61b2486f4579b7c9749e0720
+@pname = TempProduct
+
+### First GET Request 
+GET {{url}}
+
+### Register User
+POST {{url}}/user/register
+Content-Type: application/json
+Accept: */*
+
+{
+    "name": "Aniket K",
+    "username": "SpectAni",
+    "email": "aniketkhalkar791@gmail.com",
+    "password": "Nashik123"
+}
+
+### Login User
+POST {{url}}/user/login
+Content-Type: application/json
+Accept: */*
+
+{
+    "email": "aniketkhalkar791@gmail.com",
+    "password": "Nashik123"
+}
+
+### Logout
+GET {{url}}/user/logout
+Authorization: Bearer {{token}}
+
+### Update Username
+PATCH {{url}}/user/updateusername/{{uid}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Accept: */*
+
+{
+    "username": "SPECT_ANI"
+}
+
+### Update Username
+PATCH {{url}}/user/updatepassword/{{uid}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Accept: */*
+
+{
+    "password": "Nashik791"
+}
+
+### Update Image
+PATCH {{url}}/user/uploadimage/{{uid}}
+Authorization: Bearer {{token}}
+Accept: */*
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="kali.jpg"
+Content-Type: image/jpeg
+
+< ./kali.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Get Profile Image
+GET {{url}}/user/getImage/{{uid}}
+Authorization: Bearer {{token}}
+
+### Get Top 10 Latest Products
+GET {{url}}/product/getlatestproducts/
+Authorization: Bearer {{token}}
+
+### Get Specific Product by ID
+GET {{url}}/product/{{pid}}
+Authorization: Bearer {{token}}
+
+### Get Specific Product by Name
+GET {{url}}/product/name/{{pname}}
+Authorization: Bearer {{token}}
+
+### Add New Product
+POST {{url}}/product/addproduct/{{uid}}
+Authorization: Bearer {{token}}
+Accept: */*
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title";
+Content-Type: text/plain
+
+NewProd
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price";
+Content-Type: text/plain
+
+696
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description";
+Content-Type: text/plain
+
+This is a description text
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="quantity";
+Content-Type: text/plain
+
+2
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="kali.jpg"
+Content-Type: image/jpeg
+
+< ./kali.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="kali.jpg"
+Content-Type: image/jpeg
+
+< ./kali.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="kali.jpg"
+Content-Type: image/jpeg
+
+< ./kali.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 require('dotenv').config();
 
+const mode = process.env.mode
 const connection = mongoose.connection;
 
 let gfs;
@@ -27,13 +28,13 @@ exports.loginController = async (req, res) => {
 
                 if(user.isEmailVerified === false){
                     return res.status(403).send({
-                        message: "Kindly verify your email account",
+                        "message": "Kindly verify your email account",
                     })
                 }
 
                 bcrypt.compare(req.body.password,user.password,function(err,result){
                     if(err){
-                        res.status(400).send({error:err.message});
+                        return res.status(400).send({"error":err.message});
                     }else{
                         if(result === true){
 
@@ -52,9 +53,9 @@ exports.loginController = async (req, res) => {
                                 image = user.profileImg.toString('base64');
                             }
                             res.status(200).send({
-                                message: "Logged In Successfully!",
-                                token: token,
-                                user: {
+                                "message": "Logged In Successfully!",
+                                "token": token,
+                                "data": {
                                     id: user._id,
                                     name: user.name,
                                     username: user.username,
@@ -68,23 +69,37 @@ exports.loginController = async (req, res) => {
                                 },
                             });
                         }else{
-                            res.status(403).send({message:"Invalid Password"});
+                            res.status(403).send({"message":"Invalid Password"});
                         }
                     }
                 });
             }else{
-                res.status(403).send({message:"User doesn't exist"});
+                res.status(403).send({"message":"User doesn't exist"});
             }
         })
         .catch(err=>{
-            res.status(400).json({
-                error: err.message,
-            });
+            if(mode === "DEVELOPMENT"){
+                res.status(400).send({
+                    "error": err,
+                });
+            }else{
+                res.status(400).send({
+                    "error": err.message,
+                });
+            }
         })
 
     } catch (err) {
         console.log(err);
-        res.status(400).send({ error: err.message });
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
@@ -129,19 +144,33 @@ exports.registerController = async (req, res) => {
         // sending mail
         transporter.sendMail(mailOptions,function(err,info){
             if(err){
-                res.status(400).send({
-                    error:err.message,
-                })
+                if(mode === "DEVELOPMENT"){
+                    res.status(400).send({
+                        "error": err,
+                    });
+                }else{
+                    res.status(400).send({
+                        "error": err.message,
+                    });
+                }
             }else{
                 res.status(201).send({ 
-                    message: "User Registered Successfully! Kindly check your mail inbox and verify your account.",
+                    "message": "User Registered Successfully! Kindly check your mail inbox and verify your account.",
                 });
             }
         });
 
     } catch (err) {
-        console.log(err);
-        res.send({ error: err.message });
+        // console.log(err);
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
@@ -154,28 +183,40 @@ exports.emailVerificationController = async(req,res)=>{
             user.emailToken = null;
             user.isEmailVerified = true;
             await user.save();
-            res.status(200).send("Verification Successfull! Now you can login :)");
+            res.status(200).send({"message":"Verification Successfull! Now you can login :)"});
         }else{
-            res.status(403).send("Verification Failed!");
+            res.status(403).send({"message":"Verification Failed!"});
         }
 
     }catch(err){
-        res.status(400).send({
-            error: err.message,
-        });
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
 exports.logoutController = async(req,res)=>{
     try{
         res.status(200).send({
-            token: '',
-            message:'Logged Out Successfully',
+            "token": '',
+            "message":'Logged Out Successfully',
         });
     }catch(err){
-        res.status(400).send({
-            error: err.message,
-        });
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
     }
 };
 
@@ -185,9 +226,9 @@ exports.getProfileImageController = async(req,res)=>{
     var image = user.profileImg.toString('base64');
     if(user){
         res.status(200).send({
-            data: image,
+            "data": image,
         });
     }else{
-        res.status(404).send({error:"No user found"});
+        res.status(404).send({"error":"No user found"});
     }
 };
