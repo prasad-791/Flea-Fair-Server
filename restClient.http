@@ -27,7 +27,7 @@ Accept: */*
 
 {
     "email": "aniketkhalkar791@gmail.com",
-    "password": "Nashik123"
+    "password": "Nashik@123"
 }
 
 ### Logout
@@ -125,3 +125,27 @@ Content-Type: image/jpeg
 
 < ./kali.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Add Product to List
+POST {{url}}/product/addtolist/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Accept: */*
+
+{
+    "uid": "628ce2e7f0b5d48eb9970589",
+    "pid": "61b2486f4579b7c9749e0720",
+    "listNo": 3
+}
+
+### Delete Product from List
+DELETE  {{url}}/product/removefromlist/
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Accept: */*
+
+{
+    "uid": "628ce2e7f0b5d48eb9970589",
+    "pid": "61b2486f4579b7c9749e0720",
+    "listNo": 4
+}

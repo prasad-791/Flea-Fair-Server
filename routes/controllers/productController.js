@@ -194,3 +194,85 @@ exports.getProductByNameController = async(req,res) =>{
         }
     }
 };
+
+
+// ADD PRODUCT TO LIST
+exports.addProductToList = async(req,res)=>{
+    try{
+        var uid = req.body.uid;
+        var pid = req.body.pid;
+        var listNo = req.body.listNo;
+        var user = await User.findOne({_id:uid});
+        var prod = await Product.findOne({_id:pid});
+        if(user){
+            // No need to add product in owned item list from this api as it is done in another one
+            switch(listNo){
+                case 1: user.purchasedItemList.push({product:prod});   // to add the product in purchased item list
+                    break; 
+                case 2: user.shoppingCartList.push({product:prod});    // to add the product in shopping cart list
+                    break;
+                case 3: user.favouriteItemList.push({product:prod});   // to add the product in favorite item list
+                    break;  
+                default:
+                    break;
+            }
+            await user.save();
+            res.status(200).send({
+                "message": "Product added successfully!"
+            })
+        }else{
+            res.status(404).send({"error": "User not found"})
+        }
+    }catch(err){
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err.message,
+            });
+        }else{
+            console.log(err);
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
+    }
+}
+
+// REMOVE PRODUCT FROM LIST
+exports.removeProductFromList = async(req,res)=>{
+    try{
+        var uid = req.body.uid;
+        var pid = req.body.pid;
+        var listNo = req.body.listNo;
+        var user = await User.findOne({_id:uid});
+        if(user){
+            switch(listNo){
+                case 1: user.ownedItemList = user.ownedItemList.filter((data)=>data._id != pid);   // to remove the product in owned item list
+                    break;
+                case 2: user.purchasedItemList = user.purchasedItemList.filter((prod)=>prod.product != pid);    // to remove the product in purchased item list
+                    break; 
+                case 3: user.shoppingCartList = user.shoppingCartList.filter((prod)=>prod.product != pid);     // to remove the product in shopping cart list
+                    break;
+                case 4: user.favouriteItemList = user.favouriteItemList.filter((prod)=>prod.product != pid);    // to remove the product in favorite item list
+                    break;  
+                default:
+                    break;
+            }
+            await user.save();
+            res.status(200).send({
+                "message": "Product removed successfully!"
+            })
+        }else{
+            res.status(404).send({"error": "User not found"})
+        }
+    }catch(err){
+        if(mode === "DEVELOPMENT"){
+            res.status(400).send({
+                "error": err,
+            });
+        }else{
+            res.status(400).send({
+                "error": err.message,
+            });
+        }
+    }
+}

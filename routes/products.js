@@ -26,4 +26,14 @@ router.get('/:id',checkAuth,productController.getProductByIDController,(err,req,
 router.get('/name/:name',checkAuth,productController.getProductByNameController,(err,req,res,next)=>{
     res.status(400).send({"error":err.message})
 })
+
+// Add Product to List
+router.post('/addtolist/',checkAuth,productController.addProductToList,(err,req,res,next)=>{
+    res.status(400).send({"error":err.message})
+})
+
+// Remove Product from List
+router.delete('/removefromlist/',checkAuth,productController.removeProductFromList,(err,req,res,next)=>{
+    res.status(400).send({"error":err.message})
+})
 module.exports = router;
