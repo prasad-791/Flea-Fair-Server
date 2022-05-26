@@ -23,16 +23,16 @@ conn.once("open",function(){
 })
 
 // Body Parser
+app.set("view engine","ejs");
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.static("views"))
 
 // Routes
 app.use('/user',require('./routes/users'));
 app.use('/product',require('./routes/products'));
 app.get('/',(req,res)=>{
-    res.send({
-        "message":"Hello From Flea Fair"
-    });
+    res.render('app')
 })
 
 try{
