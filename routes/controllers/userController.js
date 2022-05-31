@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 // const gfs = require('../../index');
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
+const Product = require('../../models/product');
 require('dotenv').config();
 
 const mode = process.env.mode
@@ -17,22 +18,57 @@ connection.once('open',()=>{
     gfs.collection('profileImages.files');
 });
 
+function getList(li,multiEle){
+    if(multiEle === true){
+        let result = [];
+        for(var i=0;i<li.length;i++){
+            result.push(li[i]['product']);
+        }
+        return result;
+    }
+    let result = [];
+    for(var i=0;i<li.length;i++){
+        result.push(li[i]['_id']);
+    }
+    return result;
+}
+
+function convertBuffToStr(li){
+    let temp = [];
+    for(var i=0;i<li.length;i++){
+        let temp2 = [];
+        for(var j=0;j<li[i]['productImages'].length;j++){
+            temp2.push(li[i]['productImages'][j].toString('base64'));
+        }
+        temp.push({
+            "id": li[i]._id,
+            "productImages": temp2,
+            "title": li[i].title,
+            "description": li[i].description,
+            "price": li[i].price,
+            "quantity": li[i].quantity,
+            "owner": li[i].owner
+        })
+    }
+    return temp;
+}
+
 // LOGIN CONTROLLER
 exports.loginController = async (req, res) => {
     try {
 
         User.findOne({email:req.body.email})
         .exec()
-        .then(user=>{
+        .then(async(user)=>{
             if(user){
 
                 if(user.isEmailVerified === false){
                     return res.status(403).send({
-                        "message": "Kindly verify your email account",
+                        "error": "Kindly verify your email account",
                     })
                 }
 
-                bcrypt.compare(req.body.password,user.password,function(err,result){
+                bcrypt.compare(req.body.password,user.password,async(err,result)=>{
                     if(err){
                         return res.status(400).send({"error":err.message});
                     }else{
@@ -52,6 +88,19 @@ exports.loginController = async (req, res) => {
                             if(user.profileImg!=null){
                                 image = user.profileImg.toString('base64');
                             }
+                            
+                            ownedProdIds = getList(user.ownedItemList,false);
+                            purchasedProdIds = getList(user.purchasedItemList,true);
+                            shopProdIds = getList(user.shoppingCartList,true);
+                            favProdIds = getList(user.favouriteItemList,true);
+
+                            ownedList = convertBuffToStr(await Product.find({"_id":{"$in":ownedProdIds}})); 
+                            purchasedList = convertBuffToStr(await Product.find({"_id":{"$in":purchasedProdIds}}));
+                            shopList = convertBuffToStr(await Product.find({"_id":{"$in":shopProdIds}}));
+                            favList = convertBuffToStr(await Product.find({"_id":{"$in":favProdIds}}));
+
+                            
+
                             res.status(200).send({
                                 "message": "Logged In Successfully!",
                                 "token": token,
@@ -62,19 +111,19 @@ exports.loginController = async (req, res) => {
                                     email: user.email,
                                     phoneNo: user.phoneNo,
                                     image: image,
-                                    ownedItemList: user.ownedItemList,
-                                    purchasedItemList: user.purchasedItemList,
-                                    shoppingCartList: user.shoppingCartList,
-                                    favouriteItemList: user.favouriteItemList,
+                                    ownedItemList: ownedList,
+                                    purchasedItemList: purchasedList,
+                                    shoppingCartList: shopList,
+                                    favouriteItemList: favList,
                                 },
                             });
                         }else{
-                            res.status(403).send({"message":"Invalid Password"});
+                            res.status(403).send({"error":"Invalid Password"});
                         }
                     }
                 });
             }else{
-                res.status(403).send({"message":"User doesn't exist"});
+                res.status(403).send({"error":"User doesn't exist"});
             }
         })
         .catch(err=>{
@@ -185,7 +234,7 @@ exports.emailVerificationController = async(req,res)=>{
             await user.save();
             res.status(200).send({"message":"Verification Successfull! Now you can login :)"});
         }else{
-            res.status(403).send({"message":"Verification Failed!"});
+            res.status(403).send({"error":"Verification Failed!"});
         }
 
     }catch(err){

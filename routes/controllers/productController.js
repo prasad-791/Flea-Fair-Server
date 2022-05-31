@@ -195,6 +195,15 @@ exports.getProductByNameController = async(req,res) =>{
     }
 };
 
+function checkIfAlreadyAdded(li,pid){
+    for(var i=0;i<li.length;i++){
+        if(li[i]['product'].toString() === pid.toString()){
+            console.log("Hello");
+            return true;
+        }
+    }
+    return false;
+}
 
 // ADD PRODUCT TO LIST
 exports.addProductToList = async(req,res)=>{
@@ -207,12 +216,27 @@ exports.addProductToList = async(req,res)=>{
         if(user){
             // No need to add product in owned item list from this api as it is done in another one
             switch(listNo){
-                case 1: user.purchasedItemList.push({product:prod});   // to add the product in purchased item list
-                    break; 
-                case 2: user.shoppingCartList.push({product:prod});    // to add the product in shopping cart list
-                    break;
-                case 3: user.favouriteItemList.push({product:prod});   // to add the product in favorite item list
-                    break;  
+                case 1: {
+                    if(checkIfAlreadyAdded(user.purchasedItemList,prod._id)){
+                        res.status(200).send({"message":"Product already in list"});
+                        return ;
+                    }
+                    user.purchasedItemList.push({product:prod});   // to add the product in purchased item list
+                    break;} 
+                case 2: {
+                    if(checkIfAlreadyAdded(user.shoppingCartList,prod._id)){
+                        res.status(200).send({"message":"Product already in list"});
+                        return ;
+                    }
+                    user.shoppingCartList.push({product:prod});    // to add the product in shopping cart list
+                    break;}
+                case 3: {
+                    if(checkIfAlreadyAdded(user.favouriteItemList,prod._id)){
+                        res.status(200).send({"message":"Product already in list"});
+                        return ;
+                    }
+                    user.favouriteItemList.push({product:prod});   // to add the product in favorite item list
+                    break;}  
                 default:
                     break;
             }

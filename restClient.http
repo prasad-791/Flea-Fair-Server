@@ -1,6 +1,6 @@
 @url = http://localhost:3000
 //@url = https://flea-fair.herokuapp.com
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuaWtldGtoYWxrYXI3OTFAZ21haWwuY29tIiwidXNlcklEIjoiNjI4Y2UyZTdmMGI1ZDQ4ZWI5OTcwNTg5IiwiaWF0IjoxNjUzNDAwODAyfQ.NFyS4uYPZZx3gCmJdQwlRUnITNcLrXXI5aIJ2_SbHv0
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuaWtldGtoYWxrYXI3OTFAZ21haWwuY29tIiwidXNlcklEIjoiNjI4Y2UyZTdmMGI1ZDQ4ZWI5OTcwNTg5IiwiaWF0IjoxNjUzOTgzNjE2fQ.HVjKGYToNoUE_sgvIEAnPFI79NW_ICCtJTRbUAfnaH4
 @uid = 628ce2e7f0b5d48eb9970589
 @pid = 61b2486f4579b7c9749e0720
 @pname = TempProduct
@@ -27,7 +27,7 @@ Accept: */*
 
 {
     "email": "aniketkhalkar791@gmail.com",
-    "password": "Nashik@123"
+    "password": "Nashik791"
 }
 
 ### Logout
@@ -135,7 +135,7 @@ Accept: */*
 {
     "uid": "628ce2e7f0b5d48eb9970589",
     "pid": "61b2486f4579b7c9749e0720",
-    "listNo": 3
+    "listNo": 1
 }
 
 ### Delete Product from List
